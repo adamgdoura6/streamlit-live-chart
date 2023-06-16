@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['sankey']});
+      
+    window.onload = function() {  
+        
+      let demand= []
+      let supply = []
+      let values = []
+      let leng = 0
+      var chart;
+      // SET THE API FROM WHICH TO EXTRACT DATA
+      let matching_url = "http://YOUR_LINK"
+      
+      $.getJSON(
+        matching_url,
+        function(data) {
+        // THE RELEVANT PART IS HOW TO FILL THE SANKEY CHART, GOOGLE IT DONT FOLLOW THIS
+          leng = data.offerMatching.length;
+          data.offerMatching.forEach(function(match) {
+          // Extract organization names and transferred energy from the matching
+          supply.push(match.YOUR_DATA);
+          demand.push(match.YOUR_DATA);
+          values.push(match.YOUR_DATA);
+        });
+      
+        
+        // Print the supply and demand arrays
+        console.log(supply); // Output: ["SP-Org4", "SP-Org1"]
+        console.log(leng);
+        
+        var dataT = new google.visualization.DataTable();
+        dataT.addColumn('string', 'From');
+        dataT.addColumn('string', 'To');
+        dataT.addColumn('number', 'Price');
+
+        for (let i = 0; i < leng; i++) {
+            dataT.addRows([
+          [ demand[i], supply[i], values[i]]
+        ]);
+          }
+        // Sets chart options.
+        var options = {
+          width: 500,
+          height: 300,
+        };
+
+        // Instantiates and draws our chart, passing in some options.
+        chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+        chart.draw(dataT,options);
+        updateSankey();
+        
+      });
+      function updateSankey() {
+        $.getJSON(
+          matching_url,
+        function(data) {
+            // THE RELEVANT PART IS HOW TO FILL THE SANKEY CHART, GOOGLE IT DONT FOLLOW THIS
+          if (data.YOUR_DATA.length > leng ) {
+            leng = data.offerMatching.length;
+            data.offerMatching.forEach(function(match) {
+              // CHANGE THIS WITH YOUR DATA
+              supply.push(match.YOUR_DATA);
+              demand.push(match.YOUR_DATA);
+              values.push(match.price);
+            });
+          }
+
+        var dataT = new google.visualization.DataTable();
+        dataT.addColumn('string', 'From');
+        dataT.addColumn('string', 'To');
+        dataT.addColumn('number', 'Price');
+
+        for (let i = 0; i < leng; i++) {
+            dataT.addRows([
+          [ demand[i], supply[i], values[i]]
+        ]);
+          }
+        // Sets chart options.
+        var options = {
+          width: 500,
+          height: 300,
+        };
+
+        chart.draw(dataT, options);
+        setTimeout(function(){updateSankey()}, 1000);
+        });
+
+      
+
+      }
+    }
+    </script>
+   
+  </head>
+  <body>
+    <div id="sankey_basic" ></div>
+
+  </body>
+</html>
